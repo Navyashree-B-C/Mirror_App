@@ -9,8 +9,6 @@ from routes.wardrobe import wardrobe_router
 from routes.profile_picture import profile_picture_router
 from routes.generate_vector_from_images import vector_from_images_router
 from routes.recovery_routes import recovery_router
-import uvicorn  
-import os   
 
 app = FastAPI()
 
@@ -34,8 +32,3 @@ app.include_router(recovery_router)
 @app.get("/")
 async def root():
     return {"message": "Server is up and running!"}
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port)
