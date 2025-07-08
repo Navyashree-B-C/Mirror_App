@@ -1,0 +1,11 @@
+{
+    "age": 20,
+    "gender": "female",
+    "weight": 45.0,
+    "height": 150.0,
+    "style_preferences": "Casuals",
+    "skin_tone": "light",
+    "face_shape": "oval",
+    "hair_color": "brown",
+    "body_shape": "slim"
+}
