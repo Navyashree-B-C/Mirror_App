@@ -20,3 +20,4 @@ opencv-python
 numpy
 supabase
 python-multipart
+onnxruntime
