@@ -10,3 +10,12 @@ bcrypt==4.0.1
 python-jose[cryptography]
 passlib[bcrypt]
 sendgrid
+aiofiles
+pillow
+pillow-heif
+rembg
+google-generativeai
+insightface
+opencv-python
+numpy
+supabase
