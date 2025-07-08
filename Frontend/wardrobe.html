@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wardrobe – SUVAS</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root {
+      --white: #ffffff;
+      --lilac-light: #f5f0fa;
+      --lilac-dark: #7b4b94;
+    }
+
+    body {
+      font-family: sans-serif;
+      background-color: var(--white);
+      padding: 2rem;
+      margin: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--lilac-light);
+      padding: 1rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+
+    .hamburger {
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .menu {
+      display: none;
+      position: absolute;
+      top: 70px;
+      left: 20px;
+      background: var(--lilac-light);
+      border-radius: 12px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+      padding: 1rem;
+    }
+
+    .menu button {
+      display: block;
+      width: 100%;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      border: none;
+      background-color: var(--lilac-dark);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .menu button:hover {
+      background-color: #6c4e8e;
+    }
+
+    h2 {
+      color: var(--lilac-dark);
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    .upload-container {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .upload-btn {
+      background-color: var(--lilac-dark);
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .upload-btn:hover {
+      background-color: #6c4e8e;
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .item-card {
+      background: var(--lilac-light);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    }
+
+    .item-card img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    .metadata {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #444;
+    }
+
+    #uploadModal, #editModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: var(--white);
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: left;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .modal-title {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: var(--lilac-dark);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-grid input {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .save-btn {
+      grid-column: span 2;
+      background-color: var(--lilac-dark);
+      color: white;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    #clothEditModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <span class="hamburger" onclick="toggleMenu()">☰</span>
+    <div class="menu" id="menu">
+      <button onclick="openEditModal()">Edit Profile</button>
+      <button onclick="deleteProfile()">Delete Profile</button>
+    </div>
+  </div>
+
+  <h2>Your Wardrobe</h2>
+
+  <div class="upload-container">
+    <button class="upload-btn" onclick="openUploadModal()">＋</button>
+  </div>
+
+  <div class="items-grid" id="wardrobeItems"></div>
+
+  <div id="uploadModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Upload Clothing Items</h3>
+      <input type="file" id="clothesInput" accept="image/*" multiple /><br><br>
+      <button onclick="submitClothesUpload()">Upload</button>
+      <button onclick="closeUploadModal()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="editModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Profile Details</h3>
+      <div class="form-grid">
+        <input type="text" id="name" placeholder="Name" />
+        <input type="text" id="gender" placeholder="Gender" />
+        <input type="number" id="age" placeholder="Age" />
+        <input type="number" id="height" placeholder="Height" />
+        <input type="number" id="weight" placeholder="Weight" />
+        <input type="text" id="skin_tone" placeholder="Skin Tone" />
+        <input type="text" id="face_shape" placeholder="Face Shape" />
+        <input type="text" id="hair_color" placeholder="Hair Color" />
+        <input type="text" id="body_shape" placeholder="Body Shape" />
+        <input type="text" id="style_preferences" placeholder="Style Preferences" />
+      </div>
+      <button class="save-btn" onclick="submitProfileEdit()">Save Changes</button>
+      <button class="save-btn" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+  <div id="clothEditModal">
+  <div class="modal-content">
+    <h3 class="modal-title">Edit Clothing Metadata</h3>
+    <div class="form-grid">
+      <input type="text" id="edit_pattern" placeholder="Pattern" />
+      <input type="text" id="edit_texture" placeholder="Texture" />
+      <input type="text" id="edit_color" placeholder="Color" />
+      <input type="text" id="edit_category" placeholder="Category" />
+      <input type="text" id="edit_subcategory" placeholder="Sub Category" />
+    </div>
+    <button class="save-btn" onclick="submitClothEdit()">Save Changes</button>
+    <button class="save-btn" onclick="closeEditClothModal()">Cancel</button>
+  </div>
+</div>
+
+  <script>
+    const token = localStorage.getItem("profile_token");
+
+    function toggleMenu() {
+      const menu = document.getElementById("menu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    function openUploadModal() {
+      document.getElementById("uploadModal").style.display = "flex";
+    }
+
+    function closeUploadModal() {
+      document.getElementById("uploadModal").style.display = "none";
+    }
+
+    function openEditModal() {
+      document.getElementById("editModal").style.display = "flex";
+      fetch("http://localhost:8000/get-current-profile", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("name").value = data.name || "";
+        document.getElementById("gender").value = data.gender || "";
+        document.getElementById("age").value = data.age || "";
+        document.getElementById("height").value = data.height || "";
+        document.getElementById("weight").value = data.weight || "";
+        document.getElementById("skin_tone").value = data.skin_tone || "";
+        document.getElementById("face_shape").value = data.face_shape || "";
+        document.getElementById("hair_color").value = data.hair_color || "";
+        document.getElementById("body_shape").value = data.body_shape || "";
+        document.getElementById("style_preferences").value = data.style_preferences || "";
+      });
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    async function submitClothesUpload() {
+      const input = document.getElementById("clothesInput");
+      const files = input.files;
+      if (!files.length) return alert("Please select images.");
+
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append("images", files[i]);
+      }
+
+      const res = await fetch("http://localhost:8000/upload_clothes", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        closeUploadModal();
+        loadWardrobe();
+      } else {
+        alert(data.detail || "Upload failed");
+      }
+    }
+
+    async function submitProfileEdit() {
+      const body = {
+        name: document.getElementById("name").value,
+        gender: document.getElementById("gender").value,
+        age: Number(document.getElementById("age").value),
+        height: Number(document.getElementById("height").value),
+        weight: Number(document.getElementById("weight").value),
+        skin_tone: document.getElementById("skin_tone").value,
+        face_shape: document.getElementById("face_shape").value,
+        hair_color: document.getElementById("hair_color").value,
+        body_shape: document.getElementById("body_shape").value,
+        style_preferences: document.getElementById("style_preferences").value
+      };
+
+      const res = await fetch("http://localhost:8000/edit-profile-details", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Profile updated");
+        openEditModal(); // reload updated fields
+      } else {
+        alert(data.detail || "Update failed");
+      }
+    }
+
+    async function deleteProfile() {
+      const name = prompt("Enter profile name to delete:");
+      const pin = prompt("Enter PIN:");
+      if (!name || !pin) return;
+
+      const res = await fetch("http://localhost:8000/delete-profile", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, pin })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Profile deleted");
+        window.location.href = "profile_setup.html";
+      } else {
+        alert(data.detail || "Failed to delete profile");
+      }
+    }
+
+    async function loadWardrobe() {
+      const res = await fetch("http://localhost:8000/get_wardrobe", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const container = document.getElementById("wardrobeItems");
+      container.innerHTML = "";
+      data.items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "item-card";
+        card.innerHTML = `
+          <img src="${item.image_url}" alt="Clothing" />
+          <div class="metadata">
+            Pattern: ${item.pattern || "N/A"}<br>
+            Texture: ${item.texture || "N/A"}<br>
+            Color: ${item.color || "N/A"}<br>
+            Category: ${item.category || "N/A"}<br>
+            Sub Category: ${item.subcategory || "N/A"}
+            <button onclick="openEditClothModal('${item.cloth_id}')">Edit</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    let currentClothId = null;
+
+function openEditClothModal(cloth_id) {
+  currentClothId = cloth_id;
+
+  // Fetch current values to prefill inputs (optional)
+  fetch(`http://localhost:8000/get_wardrobe_item/${cloth_id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => res.json())
+    .then(data => {
+      const item = data.item;
+      document.getElementById("edit_pattern").value = item.pattern || "";
+      document.getElementById("edit_texture").value = item.texture || "";
+      document.getElementById("edit_color").value = item.color || "";
+      document.getElementById("edit_category").value = item.category || "";
+      document.getElementById("edit_subcategory").value = item.subcategory || "";
+    });
+
+  document.getElementById("clothEditModal").style.display = "flex";
+}
+
+function closeEditClothModal() {
+  document.getElementById("clothEditModal").style.display = "none";
+}
+
+async function submitClothEdit() {
+  const updates = {
+    pattern: document.getElementById("edit_pattern").value,
+    texture: document.getElementById("edit_texture").value,
+    color: document.getElementById("edit_color").value,
+    category: document.getElementById("edit_category").value,
+    subcategory: document.getElementById("edit_subcategory").value
+  };
+
+  const res = await fetch(`http://localhost:8000/edit_clothing/${currentClothId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(updates)
+  });
+
+  const data = await res.json();
+  if (res.ok) {
+    alert("Clothing updated successfully");
+    closeEditClothModal();
+    loadWardrobe();
+  } else {
+    alert(data.detail || "Failed to update clothing item.");
+  }
+}
+
+    loadWardrobe();
+  </script>
+</body>
+</html>

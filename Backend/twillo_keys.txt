@@ -1,0 +1,3 @@
+twilio_api_user_sid=SK67596fe974047b1443f800d205d0fdc6
+twilio_api_secret_key=w7Q9E001YaqUi9og76Jrn4prk2GCftr7
+sendgrid-> OTP-Email-Key- Api =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

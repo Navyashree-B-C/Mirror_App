@@ -1,0 +1,99 @@
+:root {
+  --white: #ffffff;
+  --lilac-light: #e6ddf6;
+  --lilac: #c8a2c8;
+  --lilac-dark: #a871a8;
+  --text: #333333;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--white);
+  color: var(--text);
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 2rem;
+}
+
+h1, h2 {
+  color: var(--lilac-dark);
+}
+
+input, button, select {
+  width: 100%;
+  padding: 0.8rem;
+  margin: 0.6rem 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+button {
+  background-color: var(--lilac);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: var(--lilac-dark);
+}
+
+.card {
+  background-color: var(--lilac-light);
+  padding: 1.2rem;
+  margin: 1rem 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(51, 51, 51, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: var(--white);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-content h2 {
+  color: var(--lilac-dark);
+  margin-bottom: 1rem;
+}
+
+.modal-content .resend-text {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.modal-content .resend-text button {
+  background: none;
+  border: none;
+  color: var(--lilac-dark);
+  cursor: pointer;
+  font-weight: bold;
+}

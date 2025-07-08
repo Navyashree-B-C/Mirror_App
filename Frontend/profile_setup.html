@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile Setup – SUVAS</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: var(--white);
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .profile-setup-container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .profile-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .profile-box {
+      width: 150px;
+      height: 150px;
+      border-radius: 12px;
+      background-color: var(--lilac-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .profile-box:hover {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .plus-icon {
+      font-size: 3rem;
+      color: var(--lilac-dark);
+    }
+
+    .profile-avatar {
+      width: 70px;
+      height: 70px;
+      background-color: var(--white);
+      border-radius: 50%;
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-name {
+      font-weight: bold;
+      color: var(--lilac-dark);
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-setup-container">
+    <div class="header">
+      <h1>Welcome to SUVAS</h1>
+      <p>Select or Create Your Profile</p>
+    </div>
+
+    <div id="profileGrid" class="profile-grid">
+      <!-- Profiles will be rendered here -->
+    </div>
+  </div>
+
+  <!-- Create Profile Modal -->
+  <div id="createProfileModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Create New Profile</h2>
+      <form id="createProfileForm">
+        <input type="text" id="profileName" placeholder="Profile Name" required />
+        <input type="password" id="profilePin" placeholder="4-digit PIN" maxlength="4" pattern="\d{4}" required />
+        <button type="submit">Create</button>
+        <button type="button" onclick="closeModal()">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+
+    function openModal() {
+      document.getElementById("createProfileModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("createProfileModal").classList.add("hidden");
+      document.getElementById("createProfileForm").reset();
+    }
+
+    async function loadProfiles() {
+      const res = await fetch("http://localhost:8000/get-user-profiles", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+      const profiles = Array.isArray(data) ? data : data.profiles || [];
+
+      const grid = document.getElementById("profileGrid");
+      grid.innerHTML = "";
+
+      // Render existing profiles
+      profiles.forEach((profile) => {
+        const box = document.createElement("div");
+        box.className = "profile-box";
+        box.innerHTML = `
+          <div class="profile-avatar"></div>
+          <div class="profile-name">${profile.name}</div>
+        `;
+        box.onclick = () => showPinPrompt(profile.name);
+        grid.appendChild(box);
+      });
+
+      // Add plus button
+      const plusBox = document.createElement("div");
+      plusBox.className = "profile-box";
+      plusBox.innerHTML = `<div class="plus-icon">+</div><div>Create New</div>`;
+      plusBox.onclick = openModal;
+      grid.appendChild(plusBox);
+    }
+
+    function showPinPrompt(name) {
+      const pin = prompt(`Enter PIN for ${name}`);
+      if (!pin) return;
+
+      fetch("http://localhost:8000/profile_login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, pin })
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.access_token) {
+          localStorage.setItem("profile_token", data.access_token);
+          window.location.href = "wardrobe.html";
+        } else {
+          alert(data.detail || "Invalid PIN");
+        }
+      });
+    }
+
+      document.getElementById("createProfileForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById("profileName").value.trim();
+    const pin = document.getElementById("profilePin").value.trim();
+
+    if (!name || !/^\d{4}$/.test(pin)) {
+      alert("Please enter a valid name and 4-digit PIN.");
+      return;
+    }
+
+    // Step 1: Create the profile
+    const res = await fetch("http://localhost:8000/create-profile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, pin })
+    });
+
+    if (res.ok) {
+      // Step 2: Log in to that profile
+      const loginRes = await fetch("http://localhost:8000/profile_login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, pin })
+      });
+
+      const loginData = await loginRes.json();
+
+      if (loginRes.ok && loginData.access_token) {
+        localStorage.setItem("profile_token", loginData.access_token);
+        localStorage.setItem("active_profile_name", name);
+        localStorage.setItem("new_profile", "true"); // ✅ flag new profile
+        closeModal();
+        window.location.href = "profile_details.html";
+      } else {
+        alert(loginData.detail || "Login failed after creation.");
+      }
+    } else {
+      const err = await res.json();
+      alert(err.detail || "Error creating profile");
+    }
+  });
+  loadProfiles();
+  </script>
+</body>
+</html>
